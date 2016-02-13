@@ -39,7 +39,9 @@ component.route([
 ]);
 
 const server = new Server();
-server.connection({ port: 3030 });
+server.connection({
+  port: 3030
+});
 
 /**
  * Returns an error response to the client

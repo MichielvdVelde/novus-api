@@ -35,7 +35,9 @@ component.route([{
 }]);
 
 var server = new _hapi.Server();
-server.connection({ port: 3030 });
+server.connection({
+  port: 3030
+});
 
 /**
  * Returns an error response to the client
