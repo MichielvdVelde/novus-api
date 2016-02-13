@@ -6,7 +6,7 @@ import { Component } from 'novus-component';
 import { Server } from 'hapi';
 
 const component = new Component('novus-api', {
-  url: 'mqtt://192.168.2.3'
+  url: process.env.MQTT_BROKER_URL
 });
 
 const saveConfigSetting = function(packet) {
