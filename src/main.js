@@ -42,6 +42,15 @@ const server = new Server();
 server.connection({ port: 3030 });
 
 /**
+ * Returns an error response to the client
+**/
+const replyError = function(reply, error) {
+  return reply({
+    error: error
+  });
+};
+
+/**
  *
 **/
 const handleStatusRequest = function(request, reply) {
@@ -49,9 +58,7 @@ const handleStatusRequest = function(request, reply) {
   let sensor = component.get(key);
 
   if(sensor === null) {
-    return reply({
-      'error': 'unknown ' + request.params.type + ': ' + request.params.name
-    });
+    return replyError(reply, 'unknown ' + request.params.type + ': ' + request.params.name);
   }
 
   return reply(sensor);
@@ -66,15 +73,11 @@ const handleStatusUpdate = function(request, reply) {
   let sensor = component.get(key);
 
   if(sensor === null) {
-    return reply({
-      'error': 'unknown ' + request.params.type + ': ' + request.params.name
-    });
+    return replyError(reply, format('unknown %s: %s', request.params.type, request.params.name));
   }
 
-  if(sensor.status.indexOf(status) == -1) {
-    return reply({
-      'error': 'unknown status: ' + status
-    });
+  if(sensor.status == status) {
+    return replyError(reply, format('status already %s', status));
   }
 
   let topic = format('dev/%s/actuators/%s/%s', request.params.device, request.params.type, request.params.name);
@@ -104,9 +107,7 @@ const handleSettingsRequest = function(request, reply) {
   let value = component.get(key);
 
   if(value === null) {
-    return reply({
-      error: format('unknown settings for %s: %s', request.params.device, request.params.type)
-    });
+    return replyError(reply, format('unknown settings for %s: %s', request.params.device, request.params.type));
   }
 
   return reply(value);

@@ -38,6 +38,15 @@ var server = new _hapi.Server();
 server.connection({ port: 3030 });
 
 /**
+ * Returns an error response to the client
+**/
+var replyError = function replyError(reply, error) {
+  return reply({
+    error: error
+  });
+};
+
+/**
  *
 **/
 var handleStatusRequest = function handleStatusRequest(request, reply) {
@@ -45,9 +54,7 @@ var handleStatusRequest = function handleStatusRequest(request, reply) {
   var sensor = component.get(key);
 
   if (sensor === null) {
-    return reply({
-      'error': 'unknown ' + request.params.type + ': ' + request.params.name
-    });
+    return replyError(reply, 'unknown ' + request.params.type + ': ' + request.params.name);
   }
 
   return reply(sensor);
@@ -62,15 +69,11 @@ var handleStatusUpdate = function handleStatusUpdate(request, reply) {
   var sensor = component.get(key);
 
   if (sensor === null) {
-    return reply({
-      'error': 'unknown ' + request.params.type + ': ' + request.params.name
-    });
+    return replyError(reply, (0, _util.format)('unknown %s: %s', request.params.type, request.params.name));
   }
 
-  if (status !== 'off' && status !== 'on') {
-    return reply({
-      'error': 'unknown status: ' + status
-    });
+  if (sensor.status == status) {
+    return replyError(reply, (0, _util.format)('status already %s', status));
   }
 
   var topic = (0, _util.format)('dev/%s/actuators/%s/%s', request.params.device, request.params.type, request.params.name);
@@ -98,9 +101,7 @@ var handleSettingsRequest = function handleSettingsRequest(request, reply) {
   var value = component.get(key);
 
   if (value === null) {
-    return reply({
-      error: (0, _util.format)('unknown settings for %s: %s', request.params.device, request.params.type)
-    });
+    return replyError(reply, (0, _util.format)('unknown settings for %s: %s', request.params.device, request.params.type));
   }
 
   return reply(value);
