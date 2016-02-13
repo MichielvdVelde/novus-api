@@ -78,7 +78,7 @@ var handleStatusUpdate = function handleStatusUpdate(request, reply) {
 
   var topic = (0, _util.format)('dev/%s/actuators/%s/%s', request.params.device, request.params.type, request.params.name);
   var payload = {
-    source: request.payload.source || 'api',
+    source: request.payload.source ? ['api', request.payload.source].join(':') : 'api',
     status: status,
     date: new Date()
   };
