@@ -7,7 +7,7 @@ var _novusComponent = require('novus-component');
 var _hapi = require('hapi');
 
 var component = new _novusComponent.Component('novus-api', {
-  url: 'mqtt://192.168.2.3'
+  url: process.env.MQTT_BROKER_URL
 });
 
 var saveConfigSetting = function saveConfigSetting(packet) {
