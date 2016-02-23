@@ -1,34 +1,39 @@
 'use strict';
 
 export function register(component, options) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
 
-    const saveConfigSetting = function(packet) {
-      let key = [ 'config', packet.params.device, packet.params.type ].join('/');
-      component.set(key, JSON.parse(packet.payload.toString()));
+    /**
+     * Store a system setting
+     * NOTE: Payload is assumed to be JSON!
+    **/
+    const storeSystemSetting = function(packet) {
+      let key = [ 'system' ].concat(packet.param.key).join('/');
+      let value = JSON.parse(packet.payload.toString());
+      component.set(key, value);
     };
 
-    const saveStatusSetting = function(packet) {
-      let key = [ 'status', packet.params.device, packet.params.type, packet.params.name ].join('/');
-      component.set(key, JSON.parse(packet.payload.toString()));
+    /**
+     * Store a device setting
+     * NOTE: Payload is assumed to be JSON!
+    **/
+    const storeDeviceSetting = function(packet) {
+      let key = [ 'device' ].concat(packet.params.device, packet.param.key).join('/');
+      let value = JSON.parse(packet.payload.toString());
+      component.set(key, value);
     };
 
+    /**
+     * Register routes
+    **/
     component.route([
       {
-        route: 'sys/settings/+device/actuators/+type',
-        handler: saveConfigSetting
+        route: 'sys/settings/#key',
+        handler: storeSystemSetting
       },
       {
-        route: 'sys/settings/+device/+type',
-        handler: saveConfigSetting
-      },
-      {
-        route: 'dev/+device/+type/+name',
-        handler: saveStatusSetting
-      },
-      {
-        route: 'dev/+device/actuators/+type/+name/status',
-        handler: saveStatusSetting
+        register: 'dev/+device/settings/#key',
+        handler: storeDeviceSetting
       }
     ]);
 
