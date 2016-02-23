@@ -5,38 +5,14 @@ import { format } from 'util';
 import { Component } from 'novus-component';
 import { Server } from 'hapi';
 
+import * as config from './lib/configPlugin';
+
 const component = new Component('novus-api', {
   url: process.env.MQTT_BROKER_URL
 });
 
-const saveConfigSetting = function(packet) {
-  let key = [ 'config', packet.params.device, packet.params.type ].join(':');
-  component.set(key, JSON.parse(packet.payload.toString()));
-};
-
-const saveStatusSetting = function(packet) {
-  let key = [ 'status', packet.params.device, packet.params.type, packet.params.name ].join(':');
-  component.set(key, JSON.parse(packet.payload.toString()));
-};
-
-component.route([
-  {
-    route: 'sys/settings/+device/actuators/+type',
-    handler: saveConfigSetting
-  },
-  {
-    route: 'sys/settings/+device/+type',
-    handler: saveConfigSetting
-  },
-  {
-    route: 'dev/+device/+type/+name',
-    handler: saveStatusSetting
-  },
-  {
-    route: 'dev/+device/actuators/+type/+name/status',
-    handler: saveStatusSetting
-  }
-]);
+// Register config plugin
+component.register(config.register);
 
 const server = new Server();
 server.connection({

@@ -6,33 +6,18 @@ var _novusComponent = require('novus-component');
 
 var _hapi = require('hapi');
 
+var _configPlugin = require('./lib/configPlugin');
+
+var config = _interopRequireWildcard(_configPlugin);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 var component = new _novusComponent.Component('novus-api', {
   url: process.env.MQTT_BROKER_URL
 });
 
-var saveConfigSetting = function saveConfigSetting(packet) {
-  var key = ['config', packet.params.device, packet.params.type].join(':');
-  component.set(key, JSON.parse(packet.payload.toString()));
-};
-
-var saveStatusSetting = function saveStatusSetting(packet) {
-  var key = ['status', packet.params.device, packet.params.type, packet.params.name].join(':');
-  component.set(key, JSON.parse(packet.payload.toString()));
-};
-
-component.route([{
-  route: 'sys/settings/+device/actuators/+type',
-  handler: saveConfigSetting
-}, {
-  route: 'sys/settings/+device/+type',
-  handler: saveConfigSetting
-}, {
-  route: 'dev/+device/+type/+name',
-  handler: saveStatusSetting
-}, {
-  route: 'dev/+device/actuators/+type/+name/status',
-  handler: saveStatusSetting
-}]);
+// Register config plugin
+component.register(config.register);
 
 var server = new _hapi.Server();
 server.connection({
